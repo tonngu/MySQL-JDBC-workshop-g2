@@ -158,17 +158,18 @@ public class CityDaoJDBC implements CityDao {
 
     @Override
     public int delete(City city) {
+        int rowsUpdated = 0;
         String query = "delete from city where id = ?";
         try (Connection connection = MySQLConnection.getConnection();
         PreparedStatement preparedStatement = connection.prepareStatement(query)){
             preparedStatement.setInt(1, city.getCityId());
-            int rowsUpdated = preparedStatement.executeUpdate();
+            rowsUpdated = preparedStatement.executeUpdate();
             if (rowsUpdated > 0) {
                 System.out.println("City updated successfully");
             }
-            return rowsUpdated;
         } catch(SQLException e){
             e.printStackTrace();
-        return 0;}
+        }
+        return rowsUpdated;
     }
 }
