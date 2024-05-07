@@ -17,7 +17,21 @@ public class App {
         CityDaoJDBC prelimTest = new CityDaoJDBC();
         //citySearchResult = prelimTest.findByCode("SWE");
         //citySearchResult = prelimTest.findByName("Hanoi");
-        citySearchResult.forEach(System.out::println);
+        //citySearchResult.forEach(System.out::println);
+        /*City city = prelimTest.findById(5);
+        System.out.println(city);*/
+
+        /*City addedCity1 = new City("TestCity","SWE", "TestDistrict", 500000);
+        prelimTest.add(addedCity1);*/
+        //City added with id 4081
+
+        City updatedCity = prelimTest.findById(4081);
+        updatedCity.setName("TestCity2");
+        prelimTest.update(updatedCity);
+        //updated successfully, city previously with id 4081 previously named TestCity is now TestCity2
+
+        prelimTest.delete(updatedCity);
+        //city with id 4081 is now gone from MySQL City table
 
 
 

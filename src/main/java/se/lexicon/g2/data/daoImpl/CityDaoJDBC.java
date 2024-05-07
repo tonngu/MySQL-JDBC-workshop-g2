@@ -12,7 +12,26 @@ import java.util.List;
 public class CityDaoJDBC implements CityDao {
     @Override
     public City findById(int id) {
-        return null;
+        City city = null;
+        try (Connection connection = MySQLConnection.getConnection();
+             PreparedStatement preparedStatement = connection.prepareStatement("select * from city where id = ?")) {
+            preparedStatement.setInt(1, id);
+
+            try (ResultSet resultSet = preparedStatement.executeQuery()) {
+                if (resultSet.next()) {
+                    int cityId = resultSet.getInt(1);
+                    String name = resultSet.getString(2);
+                    String countryCode = resultSet.getString(3);
+                    String district = resultSet.getString(4);
+                    int population = resultSet.getInt(5);
+                    city = new City(cityId, name, countryCode, district, population);
+                }
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return city;
     }
 
     @Override
@@ -95,16 +114,61 @@ public class CityDaoJDBC implements CityDao {
 
     @Override
     public City add(City city) {
-        return null;
+        String query = "insert into city(name, CountryCode, District, Population) values (?, ?, ?, ?)";
+        try (Connection connection = MySQLConnection.getConnection();
+                PreparedStatement preparedStatement = connection.prepareStatement(query, PreparedStatement.RETURN_GENERATED_KEYS)) {
+            preparedStatement.setString(1, city.getName());
+            preparedStatement.setString(2, city.getCountryCode());
+            preparedStatement.setString(3, city.getDistrict());
+            preparedStatement.setInt(4, city.getPopulation());
+
+
+            int rowsInserted = preparedStatement.executeUpdate();
+            if(rowsInserted >0){
+                System.out.println("City added successfully");
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return city;
     }
 
     @Override
     public City update(City city) {
-        return null;
+        String query = "update city set name = ?, CountryCode = ?, District = ?, Population = ? where id = ?";
+        try (Connection connection = MySQLConnection.getConnection();
+             PreparedStatement preparedStatement = connection.prepareStatement(query)) {
+            preparedStatement.setString(1, city.getName());
+            preparedStatement.setString(2, city.getCountryCode());
+            preparedStatement.setString(3, city.getDistrict());
+            preparedStatement.setInt(4, city.getPopulation());
+            preparedStatement.setInt(5, city.getCityId());
+
+
+            int rowsUpdated = preparedStatement.executeUpdate();
+            if (rowsUpdated > 0) {
+                System.out.println("City updated successfully");
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return city;
     }
 
     @Override
     public int delete(City city) {
-        return 0;
+        String query = "delete from city where id = ?";
+        try (Connection connection = MySQLConnection.getConnection();
+        PreparedStatement preparedStatement = connection.prepareStatement(query)){
+            preparedStatement.setInt(1, city.getCityId());
+            int rowsUpdated = preparedStatement.executeUpdate();
+            if (rowsUpdated > 0) {
+                System.out.println("City updated successfully");
+            }
+            return rowsUpdated;
+        } catch(SQLException e){
+            e.printStackTrace();
+        return 0;}
     }
 }
