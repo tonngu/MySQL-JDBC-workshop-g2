@@ -4,11 +4,9 @@ import se.lexicon.g2.data.CityDao;
 import se.lexicon.g2.db.MySQLConnection;
 import se.lexicon.g2.model.City;
 
-import java.sql.Connection;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
+import java.sql.*;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public class CityDaoJDBC implements CityDao {
@@ -19,24 +17,64 @@ public class CityDaoJDBC implements CityDao {
 
     @Override
     public List<City> findByCode(String code) {
-        return null;
+        List<City> cityList = new ArrayList<>();
+        try (Connection connection = MySQLConnection.getConnection();
+             PreparedStatement preparedStatement = connection.prepareStatement("select * from city where CountryCode = ?")) {
+            preparedStatement.setString(1, code);
+
+            try (ResultSet resultSet = preparedStatement.executeQuery()) {
+                while (resultSet.next()) {
+                    int cityId = resultSet.getInt(1);
+                    String name = resultSet.getString(2);
+                    String countryCode = resultSet.getString(3);
+                    String district = resultSet.getString(4);
+                    int population = resultSet.getInt(5);
+                    City city = new City(cityId, name, countryCode, district, population);
+                    cityList.add(city);
+                }
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return cityList;
     }
 
     @Override
     public List<City> findByName(String name) {
-        return null;
+        List<City> cityList = new ArrayList<>();
+        try (Connection connection = MySQLConnection.getConnection();
+             PreparedStatement preparedStatement = connection.prepareStatement("select * from city where `name` = ?")) {
+            preparedStatement.setString(1, name);
+
+            try (ResultSet resultSet = preparedStatement.executeQuery()) {
+                while (resultSet.next()) {
+                    int cityId = resultSet.getInt(1);
+                    String cityName = resultSet.getString(2);
+                    String countryCode = resultSet.getString(3);
+                    String district = resultSet.getString(4);
+                    int population = resultSet.getInt(5);
+                    City city = new City(cityId, cityName, countryCode, district, population);
+                    cityList.add(city);
+                }
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return cityList;
     }
+
 
     @Override
     public List<City> findAll() {
         List<City> cityList = new ArrayList<>();
-        try{
-            Connection connection = MySQLConnection.getConnection();
-            Statement statement = connection.createStatement();
-            ResultSet resultSet = statement.executeQuery("select * from city");
 
+        try (Connection connection = MySQLConnection.getConnection();
+             Statement statement = connection.createStatement();
+             ResultSet resultSet = statement.executeQuery("SELECT * FROM city")) {
 
-            while(resultSet.next()){
+            while (resultSet.next()) {
                 int cityId = resultSet.getInt(1);
                 String name = resultSet.getString(2);
                 String countryCode = resultSet.getString(3);
@@ -46,12 +84,11 @@ public class CityDaoJDBC implements CityDao {
                 cityList.add(city);
             }
 
-
-
-            } catch (SQLException e) {
+        } catch (SQLException e) {
             System.out.println("SQL Exception: ");
             e.printStackTrace();
         }
+
         cityList.forEach(System.out::println);
         return cityList;
     }

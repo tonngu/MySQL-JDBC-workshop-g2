@@ -10,13 +10,14 @@ import java.util.List;
 
 /**
  * Hello world!
- *
  */
-public class App 
-{
-    public static void main( String[] args ) {
+public class App {
+    public static void main(String[] args) {
+        List<City> citySearchResult = new ArrayList<>();
         CityDaoJDBC prelimTest = new CityDaoJDBC();
-        prelimTest.findAll();
+        //citySearchResult = prelimTest.findByCode("SWE");
+        //citySearchResult = prelimTest.findByName("Hanoi");
+        citySearchResult.forEach(System.out::println);
 
 
 
